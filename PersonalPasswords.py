@@ -14,8 +14,8 @@ ModDateList = []
 IntList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 SpecialCharList = ["!", "@", "#", "$", "%", "^",
                    "&", "*", "?", "~", "-", "_", "+", "=", "*"
-                  #Add more Chars as needed
-                  ]
+                   # Add more Chars as needed
+                   ]
 
 QuestionNameList = ["Enter first name of subject",
                     "Enter middle name of subject",
@@ -23,15 +23,15 @@ QuestionNameList = ["Enter first name of subject",
                     "Enter Spouse First Name",
                     "Enter Pet Name",
                     "Enter Known UserName or alias"
-                   #Add More Questions as needed
-                   ]
+                    # Add More Questions as needed
+                    ]
 
 QuestionDateList = ["Enter Birthday of subject (format:DDMMYYYY)",
                     "Enter Birthday of spouse (format:DDMMYYYY)",
                     "Enter Birthday of pet (format:DDMMYYYY)",
                     "Enter Anniversary date (format:DDMMYYYY)"
-                   #Add More Questions as needed
-                   ]
+                    # Add More Questions as needed
+                    ]
 
 CharSubstitutions = {
     'a': '@',
@@ -56,11 +56,11 @@ for Question in QuestionNameList:
     NameVar = input()
     if NameVar:
         NameList.append(NameVar)
-      #Prints questions and adds answers to the appropriate list
+    # Prints questions and adds answers to the appropriate list
 
 print("Enter Number of children ")
 ChildCount = int(input())
-#Aquires Number so the following can loop the correct amount of times
+# Aquires Number so the following can loop the correct amount of times
 
 if ChildCount >= 0:
     while LoopVar <= ChildCount:
@@ -74,11 +74,11 @@ if ChildCount >= 0:
             ChildrenBirthdayList.append(ChildBirthday)
             DateList.append(ChildBirthday)
         LoopVar += 1
-      #Loops for every child, gets name and b-day and adds to the correct lists
+    # Loops for every child, gets name and b-day and adds to the correct lists
 
 print("Enter how many additional names you would like to use")
 AdditionalNameCount = int(input())
-#prompts for additional names and gets a number to loop to
+# prompts for additional names and gets a number to loop to
 
 LoopVar = 1
 if AdditionalNameCount >= 1:
@@ -87,14 +87,14 @@ if AdditionalNameCount >= 1:
         ExtraName = input()
         NameList.append(ExtraName)
         LoopVar += 1
-      #loops until desired name count is reached
+    # loops until desired name count is reached
 
 for Question in QuestionDateList:
     print(Question)
     DateVar = int(input())
     if DateVar:
         DateList.append(DateVar)
-      #cycles through questions gets input and adds to list
+    # cycles through questions gets input and adds to list
 
 for date in DateList:
     date_object = datetime.strptime(str(date), '%d%m%Y')
@@ -110,18 +110,18 @@ for date in DateList:
     ModDateList.append(formatted_date)
     formatted_date = date_object.strftime('%b%Y')
     ModDateList.append(formatted_date)
-#Takes date list and changes them into other popular formats
+# Takes date list and changes them into other popular formats
 
 DateList.extend(ModDateList)
-#adds new dates to exsisting date list
+# adds new dates to exsisting date list
 
 while os.path.exists(filename):
     filename = f'PersonalPasswordList_{FileNameCounter}.txt'  # Change the filename by appending a number
     FileNameCounter += 1
-  #names file a new name
+# names file a new name
 
-with open(filename, 'a') as file: #opens file
-    for name in NameList: # loops through names and changes password chars with popular subs
+with open(filename, 'a') as file:  # opens file
+    for name in NameList:  # loops through names and changes password chars with popular subs
         file.write(name + '\n')
         for p in range(len(name)):
             modified_password = ''
@@ -137,7 +137,7 @@ with open(filename, 'a') as file: #opens file
 
     NameList.extend(ModifiedNameList)
 
-  #The following loops through the names and dates and creates combinations to generate passwords
+    # The following loops through the names and dates and creates combinations to generate passwords
     for name in NameList:
         file.write(name + '\n')
         for i in IntList:
