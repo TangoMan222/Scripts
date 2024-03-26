@@ -1,8 +1,7 @@
 # PersonalPasswords
 ## Description
 
-PersonalPasswords is a Python script designed to generate password lists based on various inputs such as names and important dates. It formulates these lists by incorporating popular formats and combinations of passwords.
-
+PersonalPasswords is a Python script designed to generate password lists based on various inputs such as names and important dates. It formulates these lists by incorporating popular formats and combinations of passwords. The length of the password list will vary based on the number and length of additional inputs provided. The minimum length is approximately 500,000 passwords, while a standard length typically consists of about 1 million passwords.
 ## Usage
 
 - Ensure you have Python installed on your system.
