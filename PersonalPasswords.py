@@ -1,12 +1,8 @@
-import string
 import os
 from datetime import datetime
 
-LoopVar = 1
 FileNameCounter = 1
 filename = "PasswordList.txt"
-ChildrenNameList = []
-ChildrenBirthdayList = []
 NameList = []
 ModifiedNameList = []
 DateList = []
@@ -47,78 +43,83 @@ CharSubstitutions = {
     # Add more substitutions as needed
 }
 
-print(" Welcome to PersonalPasswords \n")
-print(" Press Enter to Continue \n")
-input()
 
-for Question in QuestionNameList:
-    print(Question)
-    NameVar = input()
-    if NameVar:
-        NameList.append(NameVar)
-    # Prints questions and adds answers to the appropriate list
+def start_prompt():
+    print(" Welcome to PersonalPasswords \n")
+    print(" Press Enter to Continue \n")
+    input()
 
-print("Enter Number of children ")
-ChildCount = int(input())
-# Aquires Number so the following can loop the correct amount of times
 
-if ChildCount >= 0:
-    while LoopVar <= ChildCount:
-        print("Enter Child " + str(LoopVar) + " Name")
-        ChildName = input()
-        ChildrenNameList.append(ChildName)
-        NameList.append(ChildName)
-        print("Enter Child " + str(LoopVar) + " Birthday (format:DDMMYYYY)")
-        ChildBirthday = int(input())
-        if ChildBirthday:
-            ChildrenBirthdayList.append(ChildBirthday)
-            DateList.append(ChildBirthday)
-        LoopVar += 1
-    # Loops for every child, gets name and b-day and adds to the correct lists
+def print_questions():
+    for Question in QuestionNameList:
+        print(Question)
+        NameVar = input()
+        if NameVar:
+            NameList.append(NameVar)
+        # Prints question and adds answers to the appropriate list
 
-print("Enter how many additional names you would like to use")
-AdditionalNameCount = int(input())
-# prompts for additional names and gets a number to loop to
+    print("Enter Number of children ")
+    ChildCount = int(input())
+    # Acquires Number so the following can loop the correct amount of times
+    LoopVar = 1
+    if ChildCount >= 0:
+        while LoopVar <= ChildCount:
+            print("Enter Child " + str(LoopVar) + " Name")
+            ChildName = input()
+            NameList.append(ChildName)
+            print("Enter Child " + str(LoopVar) + " Birthday (format:DDMMYYYY)")
+            ChildBirthday = int(input())
+            if ChildBirthday:
+                DateList.append(ChildBirthday)
+            LoopVar += 1
+        # Loops for every child, gets name and b-day and adds to the correct lists
 
-LoopVar = 1
-if AdditionalNameCount >= 1:
-    while LoopVar <= AdditionalNameCount:
-        print("Enter Name" + str(LoopVar))
-        ExtraName = input()
-        NameList.append(ExtraName)
-        LoopVar += 1
-    # loops until desired name count is reached
+    print("Enter how many additional names you would like to use")
+    AdditionalNameCount = int(input())
+    # prompts for additional names and gets a number to loop to
 
-for Question in QuestionDateList:
-    print(Question)
-    DateVar = int(input())
-    if DateVar:
-        DateList.append(DateVar)
-    # cycles through questions gets input and adds to list
+    LoopVar = 1
+    if AdditionalNameCount >= 1:
+        while LoopVar <= AdditionalNameCount:
+            print("Enter Name" + str(LoopVar))
+            ExtraName = input()
+            NameList.append(ExtraName)
+            LoopVar += 1
+        # loops until desired name count is reached
 
-for date in DateList:
-    date_object = datetime.strptime(str(date), '%d%m%Y')
-    formatted_date = date_object.strftime('%d%b%Y')  # Format the date as ddmonyyyy (e.g., 03mar1999)
-    ModDateList.append(formatted_date)
-    formatted_date = date_object.strftime('%Y')
-    ModDateList.append(formatted_date)
-    formatted_date = date_object.strftime('%b')
-    ModDateList.append(formatted_date)
-    formatted_date = date_object.strftime('%d')
-    ModDateList.append(formatted_date)
-    formatted_date = date_object.strftime('%d%b')
-    ModDateList.append(formatted_date)
-    formatted_date = date_object.strftime('%b%Y')
-    ModDateList.append(formatted_date)
-# Takes date list and changes them into other popular formats
+    for Question in QuestionDateList:
+        print(Question)
+        DateVar = int(input())
+        if DateVar:
+            DateList.append(DateVar)
+        # cycles through questions gets input and adds to list
 
-DateList.extend(ModDateList)
-# adds new dates to exsisting date list
 
-while os.path.exists(filename):
-    filename = f'PersonalPasswordList_{FileNameCounter}.txt'  # Change the filename by appending a number
-    FileNameCounter += 1
-# names file a new name
+def date_mod(List):
+    newList = []
+    for date in List:
+        date_object = datetime.strptime(str(date), '%d%m%Y')
+        formatted_date = date_object.strftime('%d%b%Y')  # Format the date as ddmonyyyy (e.g., 03mar1999)
+        newList.append(formatted_date)
+        # Generate modified date formats
+        mod_date_list = [date_object.strftime(format) for date in newList for format in
+                         ('%d%b%Y', '%Y', '%b', '%d', '%d%b', '%b%Y')]
+        List.extend(mod_date_list)
+        return List
+
+
+def create_file(Counter, Name):
+    while os.path.exists(Name):
+        Name = f'PersonalPasswordList_{Counter}.txt'  # Change the filename by appending a number
+        Counter += 1
+    return Name
+    # names file a new name
+
+
+start_prompt()
+print_questions()
+DateList = date_mod(DateList)
+filename = create_file(FileNameCounter, filename)
 
 with open(filename, 'a') as file:  # opens file
     for name in NameList:  # loops through names and changes password chars with popular subs
