@@ -58,24 +58,44 @@ def print_questions():
             NameList.append(NameVar)
         # Prints question and adds answers to the appropriate list
 
-    print("Enter Number of children ")
-    ChildCount = int(input())
+    while True:
+        print("Enter Number of children ")
+        try:
+            ChildCount = int(input())
+            break
+        except ValueError:
+            print("Invalid input! Please enter an integer.")
     # Acquires Number so the following can loop the correct amount of times
     LoopVar = 1
-    if ChildCount >= 0:
+    if ChildCount > 0:
         while LoopVar <= ChildCount:
             print("Enter Child " + str(LoopVar) + " Name")
             ChildName = input()
             NameList.append(ChildName)
-            print("Enter Child " + str(LoopVar) + " Birthday (format:DDMMYYYY)")
-            ChildBirthday = int(input())
-            if ChildBirthday:
-                DateList.append(ChildBirthday)
+            while True:
+                try:
+                    print("Enter Child " + str(LoopVar) + " Birthday (format:DDMMYYYY)")
+                    ChildBirthday = int(input())
+                    if ChildBirthday:
+                        if len(str(ChildBirthday)) == 8:
+                            DateList.append(ChildBirthday)
+                            break
+                        else:
+                            print("Wrong format!")
+                    else:
+                        break
+                except ValueError:
+                    print("Invalid input! Please enter an integer.")
             LoopVar += 1
         # Loops for every child, gets name and b-day and adds to the correct lists
 
-    print("Enter how many additional names you would like to use")
-    AdditionalNameCount = int(input())
+    while True:
+        print("Enter how many additional names you would like to use")
+        try:
+            AdditionalNameCount = int(input())
+            break
+        except ValueError:
+            print("Invalid input! Please enter an integer.")
     # prompts for additional names and gets a number to loop to
 
     LoopVar = 1
@@ -88,10 +108,20 @@ def print_questions():
         # loops until desired name count is reached
 
     for Question in QuestionDateList:
-        print(Question)
-        DateVar = int(input())
-        if DateVar:
-            DateList.append(DateVar)
+        while True:
+            try:
+                print(Question)
+                DateVar = int(input())
+                if DateVar:
+                    if len(str(DateVar)) == 8:
+                        DateList.append(DateVar)
+                        break
+                    else:
+                        print("Wrong format!")
+                else:
+                    break
+            except ValueError:
+                print("Invalid input! Please enter an integer.")
         # cycles through questions gets input and adds to list
 
 
