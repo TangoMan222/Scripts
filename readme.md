@@ -59,4 +59,4 @@ If you wish to modify how passwords are generated or want to add new formats:
 This script is intended for educational and personal use only. Please use it responsibly, and ensure that generated passwords are not used for malicious purposes. Only test against systems or accounts that you have explicit permission to assess.
 
 ## Contributing
-Contributions are welcome! To contribute:
+Contributions are welcome!
