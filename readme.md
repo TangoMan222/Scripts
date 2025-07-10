@@ -1,9 +1,9 @@
 # PersonalPasswords
 
 ## Description
-**PersonalPasswords** is a Python script designed to generate password lists based on user-provided inputs such as names, important dates, and other personalized information. The script combines these inputs into various common password formats to generate comprehensive password lists, useful for password testing, personal security assessments, or research purposes.
+PersonalPasswords is a Python script that generates customized password lists based on OSINT-style prompts. By combining user-provided names, dates (with multiple formats), and character substitutions, it creates comprehensive wordlists useful for password spraying, red teaming, and personal security testing.
 
-The password list generated will vary in length depending on the number and complexity of the inputs provided. The script typically generates a minimum of **500,000 passwords**, with a standard list reaching approximately **1 million passwords**.
+The list length will vary depending on inputs. On average, tens of thousands to hundreds of thousands of unique passwords are generated per run.
 
 ## Features
 - Generates personalized password lists using combinations of names, dates, and custom input.
