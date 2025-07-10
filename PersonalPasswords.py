@@ -1,6 +1,3 @@
-Always show details
-
-Copy
 import os
 from datetime import datetime
 
