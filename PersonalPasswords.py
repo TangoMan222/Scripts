@@ -1,188 +1,145 @@
+Always show details
+
+Copy
 import os
 from datetime import datetime
 
-FileNameCounter = 1
-filename = "PasswordList.txt"
-NameList = []
-ModifiedNameList = []
-DateList = []
-ModDateList = []
-IntList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-SpecialCharList = ["!", "@", "#", "$", "%", "^",
-                   "&", "*", "?", "~", "-", "_", "+", "=", "*"
-                   # Add more Chars as needed
-                   ]
+# Constants
+FILENAME = "PasswordList.txt"
+FILE_COUNTER = 1
 
-QuestionNameList = ["Enter first name of subject",
-                    "Enter middle name of subject",
-                    "Enter last name of subject",
-                    "Enter Spouse First Name",
-                    "Enter Pet Name",
-                    "Enter Known UserName or alias"
-                    # Add More Questions as needed
-                    ]
+INT_LIST = list(range(10))
+SPECIAL_CHAR_LIST = ["!", "@", "#", "$", "%", "^", "&", "*", "?", "~", "-", "_", "+", "=", "*"]
 
-QuestionDateList = ["Enter Birthday of subject (format:DDMMYYYY)",
-                    "Enter Birthday of spouse (format:DDMMYYYY)",
-                    "Enter Birthday of pet (format:DDMMYYYY)",
-                    "Enter Anniversary date (format:DDMMYYYY)"
-                    # Add More Questions as needed
-                    ]
+QUESTION_NAME_LIST = [
+    "Enter first name of subject",
+    "Enter middle name of subject",
+    "Enter last name of subject",
+    "Enter Spouse First Name",
+    "Enter Pet Name",
+    "Enter Known UserName or alias"
+]
 
-CharSubstitutions = {
-    'a': '@',
-    'i': '!',
-    'o': '0',
-    'l': '1',
-    't': '7',
-    'g': '9',
-    'b': '8',
-    'z': '2',
-    'e': '3',
-    's': '5',
-    # Add more substitutions as needed
+QUESTION_DATE_LIST = [
+    "Enter Birthday of subject (format:DDMMYYYY)",
+    "Enter Birthday of spouse (format:DDMMYYYY)",
+    "Enter Birthday of pet (format:DDMMYYYY)",
+    "Enter Anniversary date (format:DDMMYYYY)"
+]
+
+CHAR_SUBSTITUTIONS = {
+    'a': '@', 'i': '!', 'o': '0', 'l': '1', 't': '7',
+    'g': '9', 'b': '8', 'z': '2', 'e': '3', 's': '5'
 }
 
-
+# Input functions
 def start_prompt():
-    print(" Welcome to PersonalPasswords \n")
-    print(" Press Enter to Continue \n")
-    input()
+    input("Welcome to PersonalPasswords. Press Enter to continue...\n")
 
-
-def print_questions():
-    for Question in QuestionNameList:
-        print(Question)
-        NameVar = input()
-        if NameVar:
-            NameList.append(NameVar)
-        # Prints question and adds answers to the appropriate list
-
+def get_date_input(prompt):
     while True:
-        print("Enter Number of children ")
+        val = input(prompt)
+        if not val:
+            return None
+        if len(val) == 8 and val.isdigit():
+            return int(val)
+        print("Invalid format! Use DDMMYYYY.")
+
+# Data collection
+def collect_osint_data():
+    name_list = []
+    date_list = []
+
+    for question in QUESTION_NAME_LIST:
+        answer = input(question + ": ")
+        if answer:
+            name_list.append(answer)
+
+    child_count = get_int_input("Enter number of children: ")
+    for i in range(child_count):
+        name = input(f"Enter Child {i+1} Name: ")
+        name_list.append(name)
+        birthday = get_date_input(f"Enter Child {i+1} Birthday (format:DDMMYYYY): ")
+        if birthday:
+            date_list.append(birthday)
+
+    extra_count = get_int_input("Enter number of additional names to include: ")
+    for i in range(extra_count):
+        extra = input(f"Enter Name {i+1}: ")
+        name_list.append(extra)
+
+    for question in QUESTION_DATE_LIST:
+        date = get_date_input(question + ": ")
+        if date:
+            date_list.append(date)
+
+    return name_list, date_list
+
+def get_int_input(prompt):
+    while True:
         try:
-            ChildCount = int(input())
-            break
+            return int(input(prompt))
         except ValueError:
             print("Invalid input! Please enter an integer.")
-    # Acquires Number so the following can loop the correct amount of times
-    LoopVar = 1
-    if ChildCount > 0:
-        while LoopVar <= ChildCount:
-            print("Enter Child " + str(LoopVar) + " Name")
-            ChildName = input()
-            NameList.append(ChildName)
-            while True:
-                try:
-                    print("Enter Child " + str(LoopVar) + " Birthday (format:DDMMYYYY)")
-                    ChildBirthday = int(input())
-                    if ChildBirthday:
-                        if len(str(ChildBirthday)) == 8:
-                            DateList.append(ChildBirthday)
-                            break
-                        else:
-                            print("Wrong format!")
-                    else:
-                        break
-                except ValueError:
-                    print("Invalid input! Please enter an integer.")
-            LoopVar += 1
-        # Loops for every child, gets name and b-day and adds to the correct lists
 
-    while True:
-        print("Enter how many additional names you would like to use")
+# Date formatting
+def modify_dates(date_list):
+    mod_dates = set()
+    for date in date_list:
         try:
-            AdditionalNameCount = int(input())
-            break
+            date_obj = datetime.strptime(str(date), '%d%m%Y')
+            mod_dates.update([
+                date_obj.strftime(fmt) for fmt in
+                ('%d%b%Y', '%Y', '%b', '%d', '%d%b', '%b%Y')
+            ])
         except ValueError:
-            print("Invalid input! Please enter an integer.")
-    # prompts for additional names and gets a number to loop to
+            continue
+    return list(set(map(str, date_list)) | mod_dates)
 
-    LoopVar = 1
-    if AdditionalNameCount >= 1:
-        while LoopVar <= AdditionalNameCount:
-            print("Enter Name" + str(LoopVar))
-            ExtraName = input()
-            NameList.append(ExtraName)
-            LoopVar += 1
-        # loops until desired name count is reached
+# Password generation
+def substitute_chars(name):
+    return ''.join([CHAR_SUBSTITUTIONS.get(c, c) for c in name])
 
-    for Question in QuestionDateList:
-        while True:
-            try:
-                print(Question)
-                DateVar = int(input())
-                if DateVar:
-                    if len(str(DateVar)) == 8:
-                        DateList.append(DateVar)
-                        break
-                    else:
-                        print("Wrong format!")
-                else:
-                    break
-            except ValueError:
-                print("Invalid input! Please enter an integer.")
-        # cycles through questions gets input and adds to list
+def generate_passwords(name_list, date_list):
+    modified_names = list({substitute_chars(name) for name in name_list if substitute_chars(name) != name})
+    name_list = list(set(name_list + modified_names))
 
+    passwords = set()
 
-def date_mod(List):
-    newList = []
-    for date in List:
-        date_object = datetime.strptime(str(date), '%d%m%Y')
-        formatted_date = date_object.strftime('%d%b%Y')  # Format the date as ddmonyyyy (e.g., 03mar1999)
-        newList.append(formatted_date)
-        # Generate modified date formats
-        mod_date_list = [date_object.strftime(format) for date in newList for format in
-                         ('%d%b%Y', '%Y', '%b', '%d', '%d%b', '%b%Y')]
-        List.extend(mod_date_list)
-        return List
+    for name in name_list:
+        passwords.add(name)
+        for i in INT_LIST:
+            passwords.add(f"{name}{i}")
+            for char in SPECIAL_CHAR_LIST:
+                passwords.add(f"{name.capitalize()}{i}{char}")
+                for name2 in name_list:
+                    passwords.add(f"{name.capitalize()}{char}{name2.capitalize()}")
+                    passwords.add(f"{name.capitalize()}{i}{char}{name2.capitalize()}")
+        for date in date_list:
+            passwords.add(str(date))
+            passwords.add(f"{name}{date}")
+            passwords.add(f"{name}@{date}")
+            for char in SPECIAL_CHAR_LIST:
+                passwords.add(f"{name.capitalize()}{date}{char}")
+                passwords.add(f"{name.capitalize()}{char}{date}")
+                passwords.add(f"{name.capitalize()}{char}{date}{char}")
+    
+    return passwords
 
+# File handling
+def create_unique_filename(base_name, counter):
+    while os.path.exists(base_name):
+        base_name = f'PersonalPasswordList_{counter}.txt'
+        counter += 1
+    return base_name
 
-def create_file(Counter, Name):
-    while os.path.exists(Name):
-        Name = f'PersonalPasswordList_{Counter}.txt'  # Change the filename by appending a number
-        Counter += 1
-    return Name
-    # names file a new name
-
-
+# Main script execution
 start_prompt()
-print_questions()
-DateList = date_mod(DateList)
-filename = create_file(FileNameCounter, filename)
+names, dates = collect_osint_data()
+dates = modify_dates(dates)
+output_file = create_unique_filename(FILENAME, FILE_COUNTER)
+passwords = generate_passwords(names, dates)
 
-with open(filename, 'a') as file:  # opens file
-    for name in NameList:  # loops through names and changes password chars with popular subs
-        file.write(name + '\n')
-        for p in range(len(name)):
-            modified_password = ''
-            previous_modified_password = ''
-            for j, letter in enumerate(name):
-                if j < p:
-                    modified_password += letter
-                else:
-                    modified_password += CharSubstitutions.get(letter, letter)
-            if modified_password != previous_modified_password:
-                ModifiedNameList.append(modified_password)
-                previous_modified_password = modified_password
-
-    NameList.extend(ModifiedNameList)
-
-    # The following loops through the names and dates and creates combinations to generate passwords
-    for name in NameList:
-        file.write(name + '\n')
-        for i in IntList:
-            file.write(name + str(i) + '\n')
-            for char in SpecialCharList:
-                file.write(name.capitalize() + str(i) + char + "\n")
-                for name2 in NameList:
-                    file.write(name.capitalize() + char + name2.capitalize() + "\n")
-                    file.write(name.capitalize() + str(i) + char + name2.capitalize() + "\n")
-        for date in DateList:
-            file.write(str(date) + '\n')
-            file.write(name + str(date) + '\n')
-            file.write(name + '@' + str(date) + '\n')
-            for char in SpecialCharList:
-                file.write(name.capitalize() + str(date) + char + '\n')
-                file.write(name.capitalize() + char + str(date) + '\n')
-                file.write(name.capitalize() + char + str(date) + char + '\n')
+with open(output_file, 'w') as file:
+    for pwd in sorted(passwords):
+        file.write(pwd + '\n')
