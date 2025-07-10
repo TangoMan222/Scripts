@@ -1,10 +1,9 @@
 import os
+import argparse
 from datetime import datetime
 
 # Constants
-FILENAME = "PasswordList.txt"
-FILE_COUNTER = 1
-
+DEFAULT_FILENAME = "PasswordList.txt"
 INT_LIST = list(range(10))
 SPECIAL_CHAR_LIST = ["!", "@", "#", "$", "%", "^", "&", "*", "?", "~", "-", "_", "+", "=", "*"]
 
@@ -29,10 +28,8 @@ CHAR_SUBSTITUTIONS = {
     'g': '9', 'b': '8', 'z': '2', 'e': '3', 's': '5'
 }
 
-# Input functions
-def start_prompt():
-    input("Welcome to PersonalPasswords. Press Enter to continue...\n")
 
+# Input functions
 def get_date_input(prompt):
     while True:
         val = input(prompt)
@@ -42,6 +39,7 @@ def get_date_input(prompt):
             return int(val)
         print("Invalid format! Use DDMMYYYY.")
 
+
 def get_int_input(prompt):
     while True:
         try:
@@ -49,9 +47,6 @@ def get_int_input(prompt):
         except ValueError:
             print("Invalid input! Please enter an integer.")
 
-def get_file_input(prompt):
-    path = input(prompt)
-    return path if os.path.exists(path) else None
 
 # Data collection
 def collect_osint_data():
@@ -83,6 +78,7 @@ def collect_osint_data():
 
     return name_list, date_list
 
+
 # Date formatting
 def modify_dates(date_list):
     mod_dates = set()
@@ -97,15 +93,19 @@ def modify_dates(date_list):
             continue
     return list(set(map(str, date_list)) | mod_dates)
 
+
 # Transformations
 def substitute_chars(name):
     return ''.join([CHAR_SUBSTITUTIONS.get(c, c) for c in name])
 
+
 def capitalization_variants(name):
     return {name.lower(), name.upper(), name.capitalize()}
 
+
 def reversed_name(name):
     return name[::-1]
+
 
 def delimiter_variants(name1, name2):
     return {
@@ -114,15 +114,17 @@ def delimiter_variants(name1, name2):
         f"{name1}.{name2}"
     }
 
+
 # Password generation
-def generate_passwords(name_list, date_list):
+def generate_passwords(name_list, date_list, use_subs=True):
     password_set = set()
     modified_names = set()
 
     for name in name_list:
         modified_names.update(capitalization_variants(name))
-        modified_names.add(substitute_chars(name))
         modified_names.add(reversed_name(name))
+        if use_subs:
+            modified_names.add(substitute_chars(name))
 
     name_list = list(set(name_list) | modified_names)
 
@@ -147,39 +149,57 @@ def generate_passwords(name_list, date_list):
     password_set.update(date_list)
     return password_set
 
+
 # File handling
-def create_unique_filename(base_name, counter):
+def create_unique_filename(base_name):
+    counter = 1
+    orig_name = base_name
     while os.path.exists(base_name):
-        base_name = f'PersonalPasswordList_{counter}.txt'
+        base_name = f'{orig_name.rstrip(".txt")}_{counter}.txt'
         counter += 1
     return base_name
 
+
 # Merge external wordlist
-def merge_wordlist(password_set):
-    file_path = get_file_input("Enter path to external wordlist to merge (leave blank to skip): ")
-    if file_path:
+def merge_wordlist(password_set, wordlist_path):
+    if wordlist_path and os.path.exists(wordlist_path):
         try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(wordlist_path, 'r', encoding='utf-8', errors='ignore') as f:
                 for line in f:
                     password_set.add(line.strip())
-            print(f"✅ Merged wordlist from: {file_path}")
+            print(f"✅ Merged wordlist from: {wordlist_path}")
         except Exception as e:
             print(f"❌ Failed to merge wordlist: {e}")
     return password_set
 
-# Main script execution
-start_prompt()
-names, dates = collect_osint_data()
-dates = modify_dates(dates)
-output_file = create_unique_filename(FILENAME, FILE_COUNTER)
-passwords = generate_passwords(names, dates)
-passwords = merge_wordlist(passwords)
 
-with open(output_file, 'w') as file:
-    for pwd in sorted(passwords):
-        file.write(pwd + '\n')
+# Argument parsing
+def parse_args():
+    parser = argparse.ArgumentParser(description="Generate a custom password list using OSINT data.")
+    parser.add_argument('--output', '-o', help="Output filename (default: PasswordList.txt)", default=DEFAULT_FILENAME)
+    parser.add_argument('--no-substitutions', action='store_true', help="Disable character substitutions (e.g. a -> @)")
+    parser.add_argument('--merge-wordlist', '-m', help="Path to external wordlist to merge")
+    return parser.parse_args()
 
-# Output stats
-print("\n✅ Password list generated!")
-print(f"📄 Output file: {output_file}")
-print(f"🔢 Total unique passwords: {len(passwords)}")
+
+# Main execution
+def main():
+    args = parse_args()
+    print("🔐 PersonalPasswords: OSINT-based Wordlist Generator\n")
+    names, dates = collect_osint_data()
+    dates = modify_dates(dates)
+    output_file = create_unique_filename(args.output)
+    passwords = generate_passwords(names, dates, use_subs=not args.no_substitutions)
+    passwords = merge_wordlist(passwords, args.merge_wordlist)
+
+    with open(output_file, 'w') as file:
+        for pwd in sorted(passwords):
+            file.write(pwd + '\n')
+
+    print("\n✅ Password list generated!")
+    print(f"📄 Output file: {output_file}")
+    print(f"🔢 Total unique passwords: {len(passwords)}")
+
+
+if __name__ == "__main__":
+    main()
