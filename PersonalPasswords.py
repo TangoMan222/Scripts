@@ -115,7 +115,6 @@ def generate_passwords(name_list, date_list):
     password_set = set()
     modified_names = set()
 
-    # Name variations
     for name in name_list:
         modified_names.update(capitalization_variants(name))
         modified_names.add(substitute_chars(name))
@@ -161,3 +160,8 @@ passwords = generate_passwords(names, dates)
 with open(output_file, 'w') as file:
     for pwd in sorted(passwords):
         file.write(pwd + '\n')
+
+# Output stats
+print("\nPassword list generated!")
+print(f"Output file: {output_file}")
+print(f"Total unique passwords: {len(passwords)}")
