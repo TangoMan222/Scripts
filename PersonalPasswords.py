@@ -49,6 +49,10 @@ def get_int_input(prompt):
         except ValueError:
             print("Invalid input! Please enter an integer.")
 
+def get_file_input(prompt):
+    path = input(prompt)
+    return path if os.path.exists(path) else None
+
 # Data collection
 def collect_osint_data():
     name_list = []
@@ -150,18 +154,32 @@ def create_unique_filename(base_name, counter):
         counter += 1
     return base_name
 
+# Merge external wordlist
+def merge_wordlist(password_set):
+    file_path = get_file_input("Enter path to external wordlist to merge (leave blank to skip): ")
+    if file_path:
+        try:
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                for line in f:
+                    password_set.add(line.strip())
+            print(f"✅ Merged wordlist from: {file_path}")
+        except Exception as e:
+            print(f"❌ Failed to merge wordlist: {e}")
+    return password_set
+
 # Main script execution
 start_prompt()
 names, dates = collect_osint_data()
 dates = modify_dates(dates)
 output_file = create_unique_filename(FILENAME, FILE_COUNTER)
 passwords = generate_passwords(names, dates)
+passwords = merge_wordlist(passwords)
 
 with open(output_file, 'w') as file:
     for pwd in sorted(passwords):
         file.write(pwd + '\n')
 
 # Output stats
-print("\nPassword list generated!")
-print(f"Output file: {output_file}")
-print(f"Total unique passwords: {len(passwords)}")
+print("\n✅ Password list generated!")
+print(f"📄 Output file: {output_file}")
+print(f"🔢 Total unique passwords: {len(passwords)}")
