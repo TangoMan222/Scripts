@@ -42,6 +42,13 @@ def get_date_input(prompt):
             return int(val)
         print("Invalid format! Use DDMMYYYY.")
 
+def get_int_input(prompt):
+    while True:
+        try:
+            return int(input(prompt))
+        except ValueError:
+            print("Invalid input! Please enter an integer.")
+
 # Data collection
 def collect_osint_data():
     name_list = []
@@ -72,13 +79,6 @@ def collect_osint_data():
 
     return name_list, date_list
 
-def get_int_input(prompt):
-    while True:
-        try:
-            return int(input(prompt))
-        except ValueError:
-            print("Invalid input! Please enter an integer.")
-
 # Date formatting
 def modify_dates(date_list):
     mod_dates = set()
@@ -93,35 +93,56 @@ def modify_dates(date_list):
             continue
     return list(set(map(str, date_list)) | mod_dates)
 
-# Password generation
+# Transformations
 def substitute_chars(name):
     return ''.join([CHAR_SUBSTITUTIONS.get(c, c) for c in name])
 
-def generate_passwords(name_list, date_list):
-    modified_names = list({substitute_chars(name) for name in name_list if substitute_chars(name) != name})
-    name_list = list(set(name_list + modified_names))
+def capitalization_variants(name):
+    return {name.lower(), name.upper(), name.capitalize()}
 
-    passwords = set()
+def reversed_name(name):
+    return name[::-1]
+
+def delimiter_variants(name1, name2):
+    return {
+        f"{name1}_{name2}",
+        f"{name1}-{name2}",
+        f"{name1}.{name2}"
+    }
+
+# Password generation
+def generate_passwords(name_list, date_list):
+    password_set = set()
+    modified_names = set()
+
+    # Name variations
+    for name in name_list:
+        modified_names.update(capitalization_variants(name))
+        modified_names.add(substitute_chars(name))
+        modified_names.add(reversed_name(name))
+
+    name_list = list(set(name_list) | modified_names)
 
     for name in name_list:
-        passwords.add(name)
+        password_set.add(name)
         for i in INT_LIST:
-            passwords.add(f"{name}{i}")
+            password_set.add(f"{name}{i}")
             for char in SPECIAL_CHAR_LIST:
-                passwords.add(f"{name.capitalize()}{i}{char}")
+                password_set.add(f"{name}{i}{char}")
                 for name2 in name_list:
-                    passwords.add(f"{name.capitalize()}{char}{name2.capitalize()}")
-                    passwords.add(f"{name.capitalize()}{i}{char}{name2.capitalize()}")
+                    password_set.add(f"{name}{char}{name2}")
+                    password_set.add(f"{name}{i}{char}{name2}")
+                    password_set.update(delimiter_variants(name, name2))
         for date in date_list:
-            passwords.add(str(date))
-            passwords.add(f"{name}{date}")
-            passwords.add(f"{name}@{date}")
+            password_set.add(f"{name}{date}")
+            password_set.add(f"{name}@{date}")
             for char in SPECIAL_CHAR_LIST:
-                passwords.add(f"{name.capitalize()}{date}{char}")
-                passwords.add(f"{name.capitalize()}{char}{date}")
-                passwords.add(f"{name.capitalize()}{char}{date}{char}")
-    
-    return passwords
+                password_set.add(f"{name}{date}{char}")
+                password_set.add(f"{name}{char}{date}")
+                password_set.add(f"{name}{char}{date}{char}")
+
+    password_set.update(date_list)
+    return password_set
 
 # File handling
 def create_unique_filename(base_name, counter):
