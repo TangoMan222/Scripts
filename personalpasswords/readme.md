@@ -1,62 +1,108 @@
 # PersonalPasswords
 
 ## Description
-PersonalPasswords is a Python script that generates customized password lists based on OSINT-style prompts. By combining user-provided names, dates (with multiple formats), and character substitutions, it creates comprehensive wordlists useful for password spraying, red teaming, and personal security testing.
 
-The list length will vary depending on inputs. On average, tens of thousands to hundreds of thousands of unique passwords are generated per run.
+**PersonalPasswords** is a Python-based command-line tool that generates customized password lists using OSINT-style inputs. It accepts user-provided names, dates (with multiple formatting patterns), and applies various transformations such as character substitutions, capitalization, delimiters, and reversals to create highly personalized and targeted wordlists.
+
+This tool is useful for password spraying, red teaming, penetration testing, CTFs, or personal security assessments.
+
+---
 
 ## Features
-- Generates personalized password lists using combinations of names, dates, and custom input.
-- Supports popular password formats and combinations.
-- Highly customizable input, allowing for unique password lists.
+
+- Generates wordlists using names, dates, and custom patterns
+- Supports character substitutions (e.g., a → @, e → 3)
+- Applies capitalization variants, string reversals, and delimiter-based combinations
+- Merges external wordlists (e.g., rockyou.txt)
+- Supports password length filtering via CLI options
+- Fully automated and non-interactive when using command-line arguments
+
+---
 
 ## Requirements
-- **Python 3.x** or later
-- Works across multiple operating systems: Windows, macOS, and Linux
 
-## Installation and Setup
-1. Ensure Python 3.x is installed on your machine. You can check your Python version by running:
-   ```bash
-   python --version
-  or
-  ```bash
-  python3 --version
-  ```
-2. Clone this repository to your local machine using Git:
+- Python 3.6 or later
+- Works on Windows, macOS, and Linux
 
-  ```bash
-  git clone https://github.com/your-username/PersonalPasswords.git
+---
+
+## Installation
+
+Clone the repository and install in development mode:
+
+```bash
+git clone https://github.com/your-username/scripts.git
+cd scripts/personalpasswords
+pip install -e .
 ```
+
+This makes the `personalpasswords` command globally available on your system.
+
+---
 
 ## Usage
-To generate a password list using PersonalPasswords:
 
-1. Run the script from your terminal:
+### Interactive Mode (Prompted Input)
 
-  ```bash
-  python PersonalPasswords.py
+```bash
+personalpasswords
 ```
-2. Follow the prompts to provide the script with inputs, including:
 
-- Names (e.g., first name, last name)
-- Important dates (e.g., birthdates, anniversaries)
-- Any other relevant details (e.g., pet names, favorite colors)
+You will be prompted for:
+- Names (first, last, aliases, pets, etc.)
+- Important dates (birthdays, anniversaries) in DDMMYYYY format
 
-3. The script will generate a list of potential passwords based on your inputs and save it to a text file.
+### Non-Interactive Mode (Fully Automated)
 
-4. The generated password list can be found in the project directory under the name **password_list.txt**.
-
-## Example:
-  ``` bash
-  python PersonalPasswords.py
+```bash
+personalpasswords \
+  --names john doe admin \
+  --dates 01011990 15082000 \
+  --output john-doe-list.txt \
+  --merge-wordlist rockyou.txt \
+  --min-length 8 \
+  --max-length 18 \
+  --no-substitutions
 ```
+
+---
+
+## Command-Line Options
+
+| Option               | Description |
+|----------------------|-------------|
+| `--names`            | List of names to include |
+| `--dates`            | List of dates in `DDMMYYYY` format |
+| `--output`, `-o`     | Output filename (default: PasswordList.txt) |
+| `--merge-wordlist`, `-m` | Path to external wordlist to merge |
+| `--no-substitutions` | Disable character substitutions |
+| `--min-length`       | Minimum password length |
+| `--max-length`       | Maximum password length |
+
+---
+
+## Output
+
+A uniquely named text file will be generated in the current directory, containing all valid, deduplicated passwords based on your inputs and options.
+
+---
+
 ## Customization
-If you wish to modify how passwords are generated or want to add new formats:
-- Edit the PersonalPasswords.py script to add or adjust the combinations of names, dates, and formats used to create the password list.
-- You can also modify the length of passwords or restrict/expand specific character types used.
+
+You can modify `personalpasswords/cli.py` to:
+- Adjust transformation logic
+- Change or expand character substitution rules
+- Modify how names and dates are combined
+- Add new CLI flags
+
+---
 
 ## Disclaimer
-This script is intended for educational and personal use only. Please use it responsibly, and ensure that generated passwords are not used for malicious purposes. Only test against systems or accounts that you have explicit permission to assess.
+
+This tool is intended for lawful, ethical, and educational use only. Do not use it against any system or account without explicit authorization. Misuse of this tool may violate laws and terms of service.
+
+---
 
 ## Contributing
-Contributions are welcome!
+
+Contributions are welcome. Feel free to fork the repository and submit pull requests with improvements, bug fixes, or additional features.
