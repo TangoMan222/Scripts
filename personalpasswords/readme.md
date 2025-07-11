@@ -31,7 +31,7 @@ This tool is useful for password spraying, red teaming, penetration testing, CTF
 Clone the repository and install in development mode:
 
 ```bash
-git clone https://github.com/your-username/scripts.git
+git clone https://github.com/TangoMan222/Scripts.git
 cd scripts/personalpasswords
 pip install -e .
 ```
