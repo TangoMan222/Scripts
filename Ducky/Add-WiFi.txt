@@ -1,0 +1,124 @@
+REM ==============================
+REM Rubber Ducky script: Add WiFi
+REM Windows 11, PowerShell + netsh
+REM Replace YOUR_SSID_HERE and YOUR_PASSWORD_HERE
+REM ==============================
+
+REM Small default delay between keystrokes
+DEFAULT_DELAY 20
+
+REM Give Windows time to recognize the Ducky as keyboard
+DELAY 2000
+
+REM Open Run dialog
+GUI r
+DELAY 500
+
+REM Start PowerShell
+STRING powershell
+DELAY 300
+ENTER
+
+REM Wait for PowerShell window to open
+DELAY 1500
+
+REM Set SSID variable
+STRING $ssid="YOUR_SSID_HERE"
+ENTER
+DELAY 400
+
+REM Set password variable
+STRING $pass="YOUR_PASSWORD_HERE"
+ENTER
+DELAY 400
+
+REM Begin XML here-string for the WiFi profile
+STRING $xml=@"
+ENTER
+DELAY 300
+
+REM Type XML content for the WLAN profile
+STRING <?xml version="1.0"?>
+ENTER
+STRING <WLANProfile xmlns="http://www.microsoft.com/networking/WLAN/profile/v1">
+ENTER
+STRING   <name>$ssid</name>
+ENTER
+STRING   <SSIDConfig>
+ENTER
+STRING     <SSID>
+ENTER
+STRING       <name>$ssid</name>
+ENTER
+STRING     </SSID>
+ENTER
+STRING   </SSIDConfig>
+ENTER
+STRING   <connectionType>ESS</connectionType>
+ENTER
+STRING   <connectionMode>auto</connectionMode>
+ENTER
+STRING   <MSM>
+ENTER
+STRING     <security>
+ENTER
+STRING       <authEncryption>
+ENTER
+STRING         <authentication>WPA2PSK</authentication>
+ENTER
+STRING         <encryption>AES</encryption>
+ENTER
+STRING         <useOneX>false</useOneX>
+ENTER
+STRING       </authEncryption>
+ENTER
+STRING       <sharedKey>
+ENTER
+STRING         <keyType>passPhrase</keyType>
+ENTER
+STRING         <protected>false</protected>
+ENTER
+STRING         <keyMaterial>$pass</keyMaterial>
+ENTER
+STRING       </sharedKey>
+ENTER
+STRING     </security>
+ENTER
+STRING   </MSM>
+ENTER
+STRING </WLANProfile>
+ENTER
+
+REM End XML here-string
+STRING "@
+ENTER
+DELAY 400
+
+REM Build path for the XML file in ProgramData
+STRING $path="$env:ProgramData\wifi-$ssid.xml"
+ENTER
+DELAY 400
+
+REM Write XML to disk
+STRING $xml ^| Out-File -FilePath $path -Encoding ASCII -Force
+ENTER
+DELAY 800
+
+REM Add the WiFi profile using netsh
+STRING netsh wlan add profile filename="$path"
+ENTER
+DELAY 1200
+
+REM Connect to the WiFi network
+STRING netsh wlan connect name="$ssid"
+ENTER
+DELAY 1500
+
+REM Optional: remove the XML file for cleanliness
+STRING Remove-Item $path -Force
+ENTER
+DELAY 600
+
+REM Exit PowerShell
+STRING exit
+ENTER
