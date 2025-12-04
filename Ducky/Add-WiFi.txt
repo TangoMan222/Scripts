@@ -100,7 +100,7 @@ ENTER
 DELAY 400
 
 REM Write XML to disk
-STRING $xml ^| Out-File -FilePath $path -Encoding ASCII -Force
+STRING $xml | Out-File -FilePath $path -Encoding ASCII -Force
 ENTER
 DELAY 800
 
